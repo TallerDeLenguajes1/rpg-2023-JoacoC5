@@ -29,6 +29,16 @@ public class Personaje
     public int Nivel { get => nivel; set => nivel = value; }
     public int Armadura { get => armadura; set => armadura = value; }
     public int Salud { get => salud; set => salud = value; }
+
+    public int Ataque(int destreza, int fuerza, int nivel)
+    {
+        return (destreza * fuerza * nivel);
+    }
+
+    public int Defensa(int armadura, int velocidad)
+    {
+        return (armadura * velocidad);
+    }
 }
 
 public class FabricaDePersonajes
@@ -39,7 +49,9 @@ public class FabricaDePersonajes
         Random random = new Random();
         string[] opcionesNombres = {"Iron Man", "Capitan America", "Hulk", "Thor", "Ojo de Halcon", "Viuda Negra", "Bruja Escarlata", "Dr. Strange", "Spider-Man", "Vision",
                               "Batman", "Superman", "Aquaman", "Mujer Maravilla", "Linterna Verde", "Flash", "Cyborg", "Shazam", "Flecha Verde", "Detective Marciano",
-                              "Profesor X", "Wolverine", "Ciclope", "Phoenix", "Bestia", "Mystique", "Magneto", "Tormenta", "Coloso", "Angelo"};
+                              "Profesor X", "Wolverine", "Ciclope", "Phoenix", "Bestia", "Mystique", "Magneto", "Tormenta", "Coloso", "Angelo",
+                              "La cosa", "Hombre Antorcha", "Hombre Elastico", "Mujer Invisible", "Ant Man", "Capitana Marvel", "Falcon", "Winter Soldier", "Black Panther", "Quick Silver",
+                              "Frost", "Firestorm", "Canario Negro", "Canario Blanco", "Capitan Frio", "Vibe", "Arsenal", "Spartan", "Atomo", "Wild Dog"};
 
         personaje.Nombre = opcionesNombres[random.Next(0, 30)];
         personaje.Velocidad = random.Next(1, 11);
@@ -51,6 +63,8 @@ public class FabricaDePersonajes
 
         return personaje;
     }
+
+
 }
 
 
