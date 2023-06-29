@@ -6,16 +6,34 @@ internal class Program
     {
         FabricaDePersonajes fabrica = new FabricaDePersonajes();
         List<Personaje> competidores = GenerarCompetidores(fabrica);
-        while (competidores.Count() > 1)
+        List<Personaje> primeraronda;
+        Console.WriteLine("Ingrese el archivo de los competidores: ");
+        string archivo = Console.ReadLine();
+        PersonajesJson auxjson = new PersonajesJson();
+
+        if (!auxjson.ExisteArchivo(archivo))
         {
-            MostrarCompetidores(competidores);
+            auxjson.GuardarPersonajes(competidores, archivo);
+            primeraronda = auxjson.LeerPersonajes(archivo);
+        }
+        else
+        {
+            primeraronda = auxjson.LeerPersonajes(archivo);
+
+        }
+
+
+        while (primeraronda.Count() > 1)
+        {
+            Console.WriteLine("\n");
+            MostrarCompetidores(primeraronda);
             int comp1, comp2;
             Console.WriteLine("\nIngrese un competidor: ");
             int.TryParse(Console.ReadLine(), out comp1);
             Console.WriteLine("Ingrese otro competidor: ");
             int.TryParse(Console.ReadLine(), out comp2);
 
-            competidores = Batalla(competidores, comp1, comp2);
+            primeraronda = Batalla(primeraronda, comp1, comp2);
 
         }
 
@@ -25,20 +43,23 @@ internal class Program
     private static List<Personaje> GenerarCompetidores(FabricaDePersonajes fabrica)
     {
         List<Personaje> carga = new List<Personaje>();
-        Personaje aux;
+        Personaje auxCarga;
+
         for (int i = 0; i < 16; i++)
         {
-            aux = fabrica.crearPersonaje();
-            if (!carga.Contains(aux)) //APARECE MAS DE UNA VEZ EL MISMO
+            auxCarga = fabrica.crearPersonaje();
+            carga.Add(auxCarga);
+
+            for (int j = 0; j < i; j++)
             {
-                carga.Add(aux);
-            }
-            else
-            {
-                i--;
+                if ((carga[j].Indice) == auxCarga.Indice)
+                {
+                    carga.RemoveAt(j);
+                    i--;
+                    break;
+                }
             }
         }
-
         return carga;
     }
 
