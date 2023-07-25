@@ -1,4 +1,6 @@
 ﻿using EspacioPersonajes;
+using Api;
+using Pokemon;
 
 internal class Program
 {
@@ -6,7 +8,7 @@ internal class Program
     {
         FabricaDePersonajes fabrica = new FabricaDePersonajes();
         List<Personaje> competidores = GenerarCompetidores(fabrica);
-        List<Personaje> primeraronda;
+        //List<Personaje> primeraronda;
         Console.WriteLine("Ingrese el archivo de los competidores: ");
         string archivo = Console.ReadLine();
         PersonajesJson auxjson = new PersonajesJson();
@@ -14,26 +16,26 @@ internal class Program
         if (!auxjson.ExisteArchivo(archivo))
         {
             auxjson.GuardarPersonajes(competidores, archivo);
-            primeraronda = auxjson.LeerPersonajes(archivo);
+            competidores = auxjson.LeerPersonajes(archivo);
         }
         else
         {
-            primeraronda = auxjson.LeerPersonajes(archivo);
-
+            competidores = auxjson.LeerPersonajes(archivo);
         }
 
 
-        while (primeraronda.Count() > 1)
+        while (competidores.Count() > 4)
         {
             Console.WriteLine("\n");
-            MostrarCompetidores(primeraronda);
+            MostrarCompetidores(competidores);
             int comp1, comp2;
             Console.WriteLine("\nIngrese un competidor: ");
             int.TryParse(Console.ReadLine(), out comp1);
             Console.WriteLine("Ingrese otro competidor: ");
             int.TryParse(Console.ReadLine(), out comp2);
 
-            primeraronda = Batalla(primeraronda, comp1, comp2);
+            competidores = Batalla(competidores, comp1, comp2);
+
 
         }
 
@@ -45,7 +47,7 @@ internal class Program
         List<Personaje> carga = new List<Personaje>();
         Personaje auxCarga;
 
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 8; i++)
         {
             auxCarga = fabrica.crearPersonaje();
             carga.Add(auxCarga);
@@ -84,10 +86,10 @@ internal class Program
             int efectividad = random.Next(1, 101);
             int danio1 = ((aux1.Ataque(aux1.Destreza, aux1.Fuerza, aux1.Nivel) * efectividad)
                             - (aux1.Defensa(aux2.Armadura, aux2.Velocidad))) / 500;
-            aux2.Salud = aux2.Salud - danio1;
+            aux2.Salud -= danio1;
             int danio2 = ((aux2.Ataque(aux2.Destreza, aux2.Fuerza, aux2.Nivel) * efectividad)
                             - (aux2.Defensa(aux2.Armadura, aux2.Velocidad))) / 500;
-            aux1.Salud = aux1.Salud - danio2;
+            aux1.Salud -= danio2;
             Console.WriteLine("Salud1: " + aux1.Salud + " || " + "Salud2: " + aux2.Salud);
         }
 

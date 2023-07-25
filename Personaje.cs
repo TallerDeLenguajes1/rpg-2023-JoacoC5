@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.IO;
-
+using Api;
 namespace EspacioPersonajes;
 
 public class Personaje
@@ -48,17 +48,13 @@ public class FabricaDePersonajes
 {
     public Personaje crearPersonaje()
     {
+        ConsumoApi auxApi = new ConsumoApi();
         var personaje = new Personaje();
         Random random = new Random();
 
-        string[] opcionesNombres = {"Iron Man", "Capitan America", "Hulk", "Thor", "Ojo de Halcon", "Viuda Negra", "Bruja Escarlata", "Dr. Strange", "Spider-Man", "Vision",
-                              "Batman", "Superman", "Aquaman", "Mujer Maravilla", "Linterna Verde", "Flash", "Cyborg", "Shazam", "Flecha Verde", "Detective Marciano",
-                              "Profesor X", "Wolverine", "Ciclope", "Phoenix", "Bestia", "Mystique", "Magneto", "Tormenta", "Coloso", "Angelo",
-                              "La cosa", "Hombre Antorcha", "Hombre Elastico", "Mujer Invisible", "Ant Man", "Capitana Marvel", "Falcon", "Winter Soldier", "Black Panther", "Quick Silver",
-                              "Frost", "Firestorm", "Canario Negro", "Canario Blanco", "Capitan Frio", "Vibe", "Arsenal", "Spartan", "Atomo", "Wild Dog"};
-
-        personaje.Indice = random.Next(0, 50);
-        personaje.Nombre = opcionesNombres[personaje.Indice];
+        personaje.Indice = random.Next(1, 151);
+        auxApi.Consulta(personaje.Indice);
+        personaje.Nombre = auxApi.Nombre;
         personaje.Velocidad = random.Next(1, 11);
         personaje.Destreza = random.Next(1, 6);
         personaje.Fuerza = random.Next(1, 11);
