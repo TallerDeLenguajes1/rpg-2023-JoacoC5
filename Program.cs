@@ -6,69 +6,73 @@ internal class Program
 {
     private static void Main(string[] args)
     {
+        Console.WriteLine("\n" + @"|==========================|
+|==========================|
+|                          |
+|       BIENVENIDO A       |
+|         LA LIGA          |
+|         POKEMON          |
+|                          |
+'--------------------------'" + "\n");
+
+        Console.WriteLine("Preparando los Pokemon, aguarde un momento...\n");
+
         FabricaDePersonajes fabrica = new FabricaDePersonajes();
         List<Personaje> competidores = GenerarCompetidores(fabrica);
         List<Personaje> semifinalistas = new List<Personaje>();
         List<Personaje> finalistas = new List<Personaje>();
-        Console.WriteLine("Ingrese el archivo de los competidores: ");
+        Console.WriteLine("Ingrese la Liga en la que desea competir: ");
         string? archivo = Console.ReadLine();
+        archivo += ".json";
         PersonajesJson auxjson = new PersonajesJson();
-        int comp1, comp2, auxArchivo;
+        int auxArchivo;
 
         if (archivo != null)
         {
             if (!auxjson.ExisteArchivo(archivo))
             {
                 auxjson.GuardarPersonajes(competidores, archivo);
-                competidores = auxjson.LeerPersonajes(archivo);
             }
             else
             {
-                MostrarCompetidores(auxjson.LeerPersonajes(archivo));
-                Console.WriteLine("\nDesea utilizar estos concursantes? (1=si - 0=no): ");
-                int.TryParse(Console.ReadLine(), out auxArchivo);
-                if (auxArchivo == 1)
+                if (auxjson.LeerPersonajes(archivo).Count() != 8)
                 {
-                    competidores = auxjson.LeerPersonajes(archivo);
+                    Console.WriteLine("\nEl archivo seleccionado no cumple con los requisitos necesarios\nSe generaran nuevos competidores\n");
+                    auxjson.GuardarPersonajes(competidores, archivo);
                 }
+                else
+                {
+                    Console.WriteLine("");
+                    MostrarCompetidores(auxjson.LeerPersonajes(archivo));
+                    Console.WriteLine("\nDesea utilizar estos concursantes? (1=si - 0=no): ");
+                    int.TryParse(Console.ReadLine(), out auxArchivo);
+                    if (auxArchivo == 1)
+                    {
+                        competidores = auxjson.LeerPersonajes(archivo);
+                    }
+                }
+
             }
 
             Console.WriteLine("\n-----PRIMERA FASE-----\n");
-            while (competidores.Count() > 1)
-            {
-                MostrarCompetidores(competidores);
-                Console.WriteLine("\nIngrese un competidor: ");
-                int.TryParse(Console.ReadLine(), out comp1);
-                Console.WriteLine("Ingrese otro competidor: ");
-                int.TryParse(Console.ReadLine(), out comp2);
-
-                competidores = Batalla(competidores, comp1, comp2, semifinalistas);
-            }
-
+            semifinalistas = Ronda(competidores);
             Console.WriteLine("\n\n\n-----SEMIFINALES-----\n");
-            while (semifinalistas.Count() > 1)
-            {
-                MostrarCompetidores(semifinalistas);
-                Console.WriteLine("\nIngrese un competidor: ");
-                int.TryParse(Console.ReadLine(), out comp1);
-                Console.WriteLine("Ingrese otro competidor: ");
-                int.TryParse(Console.ReadLine(), out comp2);
-
-                semifinalistas = Batalla(semifinalistas, comp1, comp2, finalistas);
-            }
-
+            finalistas = Ronda(semifinalistas);
             Console.WriteLine("\n\n\n-----FINAL-----\n");
-            MostrarCompetidores(finalistas);
-            Console.WriteLine("\nIngrese un competidor: ");
-            int.TryParse(Console.ReadLine(), out comp1);
-            Console.WriteLine("Ingrese otro competidor: ");
-            int.TryParse(Console.ReadLine(), out comp2);
+            finalistas = Ronda(finalistas);
 
-            finalistas = Batalla(finalistas, comp1, comp2, finalistas);
+            Console.WriteLine(@"|==========================|
+|==========================|
+|                          |
+|         GANADOR          |
+|        DE LA LIGA        |
+|        " + finalistas[0].Nombre.ToUpper().PadRight(10) + @"        |
+|                          |
+'--------------------------'");
         }
         else
         {
-            Console.WriteLine("No se ingreso un nombre de archivo valido");
+            Console.WriteLine("\nNo se ingreso un nombre de archivo valido\n");
         }
     }
 
@@ -103,6 +107,29 @@ internal class Program
         }
     }
 
+    private static List<Personaje> Ronda(List<Personaje> competidores)
+    {
+        List<Personaje> ganadores = new List<Personaje>();
+        int comp1, comp2;
+        while (competidores.Count() > 1)
+        {
+            MostrarCompetidores(competidores);
+            do
+            {
+                Console.WriteLine("\nIngrese un competidor: ");
+                int.TryParse(Console.ReadLine(), out comp1);
+            } while (comp1 >= competidores.Count());
+            do
+            {
+                Console.WriteLine("Ingrese otro competidor: ");
+                int.TryParse(Console.ReadLine(), out comp2);
+            } while (comp2 > competidores.Count());
+
+            competidores = Batalla(competidores, comp1, comp2, ganadores);
+        }
+        return ganadores;
+    }
+
     private static List<Personaje> Batalla(List<Personaje> competidores, int comp1, int comp2, List<Personaje> semifinalistas)
     {
         Personaje aux1 = competidores[comp1 - 1], aux2 = competidores[comp2 - 1];
@@ -110,14 +137,16 @@ internal class Program
 
         Console.WriteLine("\n------BATALLA------\n");
         Console.WriteLine(aux1.Nombre + " VS " + aux2.Nombre + "\n");
+        int efectividad, danio1, danio2;
 
         while ((aux1.Salud > 0) && (aux2.Salud > 0))
         {
-            int efectividad = random.Next(1, 101);
-            int danio1 = ((aux1.Ataque(aux1.Destreza, aux1.Fuerza, aux1.Nivel) * efectividad)
+            efectividad = random.Next(1, 101);
+            danio1 = ((aux1.Ataque(aux1.Destreza, aux1.Fuerza, aux1.Nivel) * efectividad)
                             - (aux1.Defensa(aux2.Armadura, aux2.Velocidad))) / 500;
+            efectividad = random.Next(1, 101);
             aux2.Salud -= danio1;
-            int danio2 = ((aux2.Ataque(aux2.Destreza, aux2.Fuerza, aux2.Nivel) * efectividad)
+            danio2 = ((aux2.Ataque(aux2.Destreza, aux2.Fuerza, aux2.Nivel) * efectividad)
                             - (aux2.Defensa(aux2.Armadura, aux2.Velocidad))) / 500;
             aux1.Salud -= danio2;
             Console.WriteLine("Salud1: " + aux1.Salud + " || " + "Salud2: " + aux2.Salud);
